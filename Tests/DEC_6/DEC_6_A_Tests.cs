@@ -14,21 +14,38 @@ public class DEC_6_A_Tests
     public void Star1()
     {
         var lines = FileReader.ReadFile(@"DEC_6\input.txt");
-        var sum = Sum(lines.ToArray());
+        var sum = Sum(lines.First());
         Console.WriteLine(sum);
-        sum.Should().Be("");
+        //sum.Should().Be("");
+    }
+
+    [TestCase("mjqjpqmgbljsphdztnvjfqwrcgsmlb", 7)]
+    [TestCase("bvwbjplbgvbhsrlpgdmjqwftvncz", 5)]
+    [TestCase("nppdvjthqldpwncqszvftbrmjlhg", 6)]
+    [TestCase("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 10)]
+    [TestCase("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 11)]
+    public void Star1_Example(string input, int result)
+    {
+        var sum = Sum(input);
+        Console.WriteLine(sum);
+        sum.Should().Be(result);
     }
     
-    [Test]
-    public void Star1_Example()
+    private static int Sum(string input)
     {
-        var lines = FileReader.ReadFile(@"DEC_6\example.txt");
-        var sum = Sum(lines.ToArray());
-        Console.WriteLine(sum);
-        sum.Should().Be("");
-    }
-    private static string Sum(string[] lines)
-    {
-        return "";
+        var chars = input.ToCharArray().ToList();
+
+        var subTotal = 0;
+        var uniqeLength = 4;
+
+        for (int i = 0; i < chars.Count(); i++)
+        {
+            if (chars.GetRange(i,uniqeLength).Distinct().Count() == uniqeLength)
+                {
+                    subTotal += i+uniqeLength;
+                    break;
+                }
+        }
+        return subTotal;
     }
 }
