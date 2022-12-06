@@ -6,16 +6,24 @@ using Tests.Helpers;
 namespace Tests;
 
 [TestFixture]
-public class DEC_6_B_Tests
+public class DEC_6_B_Tests : BaseTest
 {
 
     [Test]
     public void Star1()
     {
+        //Arrange
+        timer.StartTimer();
         var lines = FileReader.ReadFile(@"DEC_6\input.txt");
+        
+        //Act
         var sum = Sum(lines.First());
+        
+        //Assert
         Console.WriteLine(sum);
         //sum.Should().Be("");
+        
+        Console.WriteLine(timer.StopTimer());
     }
 
     [TestCase("mjqjpqmgbljsphdztnvjfqwrcgsmlb", 19)]
@@ -29,7 +37,7 @@ public class DEC_6_B_Tests
         Console.WriteLine(sum);
         sum.Should().Be(result);
     }
-    
+
     private static int Sum(string input)
     {
         var chars = input.ToCharArray().ToList();
@@ -39,9 +47,9 @@ public class DEC_6_B_Tests
 
         for (int i = 0; i < chars.Count(); i++)
         {
-            if (chars.GetRange(i,uniqeLength).Distinct().Count() == uniqeLength)
+            if (chars.GetRange(i, uniqeLength).Distinct().Count() == uniqeLength)
             {
-                subTotal += i+uniqeLength;
+                subTotal += i + uniqeLength;
                 break;
             }
         }

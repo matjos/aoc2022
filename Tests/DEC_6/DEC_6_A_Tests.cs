@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using FluentAssertions;
 using NUnit.Framework;
@@ -7,15 +8,23 @@ using Tests.Helpers;
 namespace Tests;
 
 [TestFixture]
-public class DEC_6_A_Tests
+public class DEC_6_A_Tests : BaseTest
 {
 
     [Test]
     public void Star1()
     {
+        //Arrange
+        timer.StartTimer();
         var lines = FileReader.ReadFile(@"DEC_6\input.txt");
+        
+        //Act
         var sum = Sum(lines.First());
+        
+        //Assert
         Console.WriteLine(sum);
+        Console.WriteLine(timer.StopTimer());
+        
         //sum.Should().Be("");
     }
 
