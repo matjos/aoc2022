@@ -48,7 +48,7 @@ public class DEC_7_A_Tests : BaseTest
         var listDir = "$ ls";
         var dirName = "dir";
 
-        var currentDirrD = new Dir{FolderName = "/"};
+        var currentDirrD = new Dir { FolderName = "/" };
 
         Dir currentFolder = null;
         var dictionarys = new Dictionary<string, Dir>();
@@ -72,18 +72,19 @@ public class DEC_7_A_Tests : BaseTest
                     case "/":
                         {
                             stack = new Stack<string>();
-                            stack.Push("/");
-                            if (!dictionarys.ContainsKey(command))
+                            var key = "root-" + command;
+                            stack.Push(key);
+                            if (!dictionarys.ContainsKey(key))
                             {
                                 var dir1 = new Dir
                                 {
                                     FolderName = command
                                 };
-                                
-                                dictionarys.Add(command, dir1);
+
+                                dictionarys.Add(key, dir1);
                             }
 
-                            currentDirrD = dictionarys[command];
+                            currentDirrD = dictionarys[key];
                             break;
                         }
                     case "..":
@@ -95,20 +96,21 @@ public class DEC_7_A_Tests : BaseTest
                         }
                     default:
                         {
-                            stack.Push(command);
-                            if (!dictionarys.ContainsKey(command))
+                            var key = stack.Peek().Split("-")[1] + "-" + command;
+                            if (!dictionarys.ContainsKey(key))
                             {
                                 var dir1 = new Dir
                                 {
                                     FolderName = command
                                 };
-                                
-                                dictionarys.Add(command, dir1);
+
+                                dictionarys.Add(key, dir1);
                             }
-                            
+
+                            stack.Push(key);
                             currentDir = stack.Peek();
                             currentDirrD = dictionarys[currentDir];
-                            
+
                             break;
                         }
                 }
@@ -121,50 +123,69 @@ public class DEC_7_A_Tests : BaseTest
             {
                 var commands = line.Split(" ");
                 var command = commands.Last();
-                
-                if (!dictionarys.ContainsKey(command))
+                var key = "";
+
+                key = currentDirrD.FolderName + "-" + command;
+
+
+                if (!dictionarys.ContainsKey(key))
                 {
                     var dir1 = new Dir
                     {
                         Parent = currentDirrD,
                         FolderName = command
                     };
-                                
-                    dictionarys.Add(command, dir1);
+
+                    dictionarys.Add(key, dir1);
                 }
-                
-                currentDirrD.Folders.Add(dictionarys[command]);
+
+                currentDirrD.Folders.Add(dictionarys[key]);
             }
             else
             {
                 var command = line.Split(" ");
-                currentDirrD.Files.Add(new XFile{Size = Int32.Parse(command[0]), FileName = command[1]});
+                currentDirrD.Files.Add(new XFile { Size = Int32.Parse(command[0]), FileName = command[1] });
             }
         }
 
-        var x = dictionarys["/"];
-
         float result = 0;
-        
+
         foreach (var val in dictionarys.Values)
         {
-            var fileSum = val.sumFiles() + sumMe(val.Folders);
+            var fileSum = 0F;
+            try
+            {
+                fileSum = val.sumFiles() + sumMe(val.Folders);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"{val.FolderName} : TO BIG EXCEPTION");
+                continue;
+            }
+
 
             if (fileSum > 100000)
             {
+                Console.WriteLine($"{val.FolderName} : {fileSum} TO BIG");
                 continue;
             }
+            Console.WriteLine($"{val.FolderName} : {fileSum} ");
             result += fileSum;
         }
-        
+
         return result;
     }
 
     public static float sumMe(IList<Dir> dirs)
     {
-        if (!dirs.Any() || dirs.Sum(x => x.sumFiles()) > 100000)
+        if (!dirs.Any())
         {
             return 0;
+        }
+
+        if (dirs.Sum(x => x.sumFiles()) > 100000)
+        {
+            throw new Exception();
         }
         return dirs.Sum(x => x.sumFiles() + sumMe(x.Folders));
     }
