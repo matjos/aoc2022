@@ -22,7 +22,7 @@ public class DEC_7_A_Tests : BaseTest
 
         //Assert
         Console.WriteLine(sum);
-        sum.Should().Be(0);
+        //sum.Should().Be(0);
 
         Console.WriteLine(timer.StopTimer());
     }
@@ -42,7 +42,7 @@ public class DEC_7_A_Tests : BaseTest
         sum.Should().Be(95437);
         Console.WriteLine(timer.StopTimer());
     }
-    private static int Sum(string[] lines)
+    private static float Sum(string[] lines)
     {
         var changeDir = "$ cd ";
         var listDir = "$ ls";
@@ -126,11 +126,14 @@ public class DEC_7_A_Tests : BaseTest
                 {
                     var dir1 = new Dir
                     {
+                        Parent = currentDirrD,
                         FolderName = command
                     };
                                 
                     dictionarys.Add(command, dir1);
                 }
+                
+                currentDirrD.Folders.Add(dictionarys[command]);
             }
             else
             {
@@ -138,15 +141,42 @@ public class DEC_7_A_Tests : BaseTest
                 currentDirrD.Files.Add(new XFile{Size = Int32.Parse(command[0]), FileName = command[1]});
             }
         }
-        return 0;
+
+        var x = dictionarys["/"];
+
+        float result = 0;
+        
+        foreach (var val in dictionarys.Values)
+        {
+            var fileSum = val.sumFiles() + sumMe(val.Folders);
+
+            if (fileSum > 100000)
+            {
+                continue;
+            }
+            result += fileSum;
+        }
+        
+        return result;
+    }
+
+    public static float sumMe(IList<Dir> dirs)
+    {
+        if (!dirs.Any() || dirs.Sum(x => x.sumFiles()) > 100000)
+        {
+            return 0;
+        }
+        return dirs.Sum(x => x.sumFiles() + sumMe(x.Folders));
     }
 
     public class Dir
     {
+        public Dir Parent { get; set; }
         public string FolderName { get; set; }
         public List<XFile> Files { get; set; } = new List<XFile>();
+        public List<Dir> Folders { get; set; } = new List<Dir>();
 
-        public int sumFiles()
+        public float sumFiles()
         {
             return Files.Sum(x => x.Size);
         }
@@ -155,5 +185,5 @@ public class DEC_7_A_Tests : BaseTest
 public class XFile
 {
     public string FileName { get; set; }
-    public int Size { get; set; }
+    public float Size { get; set; }
 }
