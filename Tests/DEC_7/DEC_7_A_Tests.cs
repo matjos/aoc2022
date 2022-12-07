@@ -22,7 +22,7 @@ public class DEC_7_A_Tests : BaseTest
 
         //Assert
         Console.WriteLine(sum);
-        //sum.Should().Be(0);
+        sum.Should().Be(1845346);
 
         Console.WriteLine(timer.StopTimer());
     }
@@ -55,6 +55,7 @@ public class DEC_7_A_Tests : BaseTest
         var currentDir = "";
 
         var stack = new Stack<string>();
+        stack.Push("root");
 
         var dir = new Dir();
 
@@ -71,9 +72,10 @@ public class DEC_7_A_Tests : BaseTest
                 {
                     case "/":
                         {
-                            stack = new Stack<string>();
-                            var key = "root-" + command;
-                            stack.Push(key);
+                            var defKey = stack.ToList();
+                            defKey.Reverse();
+                            var key = string.Join("-", defKey) + "-" + command;
+                            stack.Push(command);
                             if (!dictionarys.ContainsKey(key))
                             {
                                 var dir1 = new Dir
@@ -90,13 +92,17 @@ public class DEC_7_A_Tests : BaseTest
                     case "..":
                         {
                             stack.Pop();
-                            currentDir = stack.Peek();
+                            var defKey = stack.ToList();
+                            defKey.Reverse();
+                            currentDir = string.Join("-", defKey);
                             currentDirrD = dictionarys[currentDir];
                             break;
                         }
                     default:
                         {
-                            var key = stack.Peek().Split("-")[1] + "-" + command;
+                            var defKey = stack.ToList();
+                            defKey.Reverse();
+                            var key = string.Join("-",defKey) + "-" + command;
                             if (!dictionarys.ContainsKey(key))
                             {
                                 var dir1 = new Dir
@@ -107,9 +113,9 @@ public class DEC_7_A_Tests : BaseTest
                                 dictionarys.Add(key, dir1);
                             }
 
-                            stack.Push(key);
-                            currentDir = stack.Peek();
-                            currentDirrD = dictionarys[currentDir];
+                            stack.Push(command);
+
+                            currentDirrD = dictionarys[key];
 
                             break;
                         }
@@ -125,7 +131,9 @@ public class DEC_7_A_Tests : BaseTest
                 var command = commands.Last();
                 var key = "";
 
-                key = currentDirrD.FolderName + "-" + command;
+                var defKey = stack.ToList();
+                defKey.Reverse();
+                key = string.Join("-",defKey) + "-" + command;
 
 
                 if (!dictionarys.ContainsKey(key))
